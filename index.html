@@ -50,7 +50,7 @@
 			     <section><h1>Overview</h1>
 			     <ul>
 			        <li>Popular for Visualization (Maps!)</li>
-				<li>Join Semantics</li>
+				<li>Join Semantics between DOM and Data</li>
 				<li>Low Level Package</li>
 				<li>Spawning High Level Add-Ons<ul>
 				  <li>NVD3 (Novus)</li>
@@ -60,6 +60,23 @@
 				</li>
 		             </ul>
 			     </section>
+			     <section><h1>Selections</h1>
+			     <ul>
+			       <li><strong>d3.select</strong> for single nodes</li>
+			       <li><strong>d3.selectAll</strong> for multiple nodes</li>
+			       <li>Joined to data using <strong>data</strong></li>
+			       <li>Chained style for most operations</li>
+			     </ul>
+			     </section>
+			     <section><h1>Making a Selection</h1>
+			     <pre><code contenteditable id="selection1-code">
+//Select all of the &lt;li&gt; elements inside of &lt;ul id="selection1"&gt;
+var ds  = ["Item 1","Item 2","Item 3","Item 4"];
+var items = d3.select('ul#selection1').selectAll('li').data(ds);
+                             </code></pre>
+			     </section>
+
+			     
 			  </section>
 			        <section>
 			  <div class="gridster" style="left: -50%;">
@@ -97,6 +114,7 @@
 		<script src="js/reveal.min.js"></script>
                 <script src="js/jquery.js"></script>
 		<script src="js/gridster.js"></script>
+		<script src="js/d3.v3.min.js"></script>
 		<script>
 		$(function() {
 			// Full list of configuration options available here:
