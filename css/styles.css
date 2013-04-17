@@ -5,11 +5,11 @@
 }
 
 .gridster .gs_w {
-    background: #FFF;
+    background: #999;
     cursor: pointer;
     -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.3);
     box-shadow: 0 0 5px rgba(0,0,0,0.3);
-    color: #AAA;
+    color: #DDD;
     padding: 4px;
 }
 
@@ -24,4 +24,13 @@
     -o-transition: opacity .6s;
     -ms-transition: opacity .6s;
     transition: opacity .6s;
+}
+
+.gridster li p {
+	text-align: center;
+}
+
+.gridster li p.statistic {
+	color: #FFF;
+	font-size: 110%;
 }

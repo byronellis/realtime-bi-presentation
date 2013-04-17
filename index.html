@@ -41,56 +41,216 @@
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
 
-				<section>
-					<h1>Real-time stream processing &amp; Visualization</h1>
-					<h3>Kafka, Storm, D3 and Friends</h3>
-				</section>
+			  <!-- Title Slides -->
 			  <section>
+			  		<section>
+						<h1>Real-time stream processing &amp; Visualization</h1>
+						<h3>Kafka, Storm, D3 and Friends</h3>
+					</section>
+					
+					<section>
+						<h1>Byron Ellis</h1>
+						<h3>Chief Data Scientist @ LivePerson, Inc.</h3>
+						<p>Statistician by training, engineer by experience. Started out in "big data" working on genome and microarray data (back when a terabyte was pretty big).</p>
+					</section>
+					
+					<section>
+						<h1>Some things to talk about...</h1>
+						<ul>
+							<li>In-Browser Visualization with D3.js and node.js</li>
+							<li>Driving that visualization from Storm (and Redis)</li>
+							<li>Using Kafka to move data around.</li>
+							<li>A little bit of jQuery to make life easier.</li>
+						</ul>
+					</section>
+		      </section>
+
+			 <!-- Demo Visualization -->
+			<section>
+			  <div class="gridster" style="left: -50%;">
+			    <ul>
+			      <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+			      	<p>LINES</p>
+			      	<p class="statistic" data-segment="statistics" data-value="lines" data-format="number">0</p>
+			      </li>
+			      <li data-row="2" data-col="1" data-sizex="1" data-sizey="1"></li>
+			      <li data-row="3" data-col="1" data-sizex="1" data-sizey="1"></li>
+ 
+			      <li data-row="1" data-col="2" data-sizex="2" data-sizey="1"></li>
+			      <li data-row="2" data-col="2" data-sizex="2" data-sizey="2">
+			      	<p>POPULARITY</p>
+			      </li>
+			      
+			      <li data-row="1" data-col="4" data-sizex="1" data-sizey="1">
+			      	<p>WORDS</p>
+			      	<p class="statistic" data-segment="statistics" data-value="words" data-format="number">0</p>			      	
+			      </li>
+			      <li data-row="2" data-col="4" data-sizex="2" data-sizey="1"></li>
+			      <li data-row="3" data-col="4" data-sizex="1" data-sizey="1"></li>
+			      
+			      <li data-row="1" data-col="5" data-sizex="1" data-sizey="1"></li>
+			      <li data-row="3" data-col="5" data-sizex="1" data-sizey="1">
+			      	<p style="font-size: 80%">SPEAKERS</p>
+			      	<p class="statistic" data-segment="statistics" data-value="actors" data-format="number">0</p>			      	
+			      </li>
+			      
+			      <li data-row="1" data-col="6" data-sizex="1" data-sizey="1"></li>
+			      <li data-row="2" data-col="6" data-sizex="1" data-sizey="2"></li>
+			    </ul>
+			  </div>
+			  </section>			 		      
+		      
+		      
+		      
+		      <!-- Browser Visualization -->
+			  <section>
+		         <section><h1>Visualization in the Browser</h1></section>			  	
 			     <section><h1>Data Driven Documents (D3)</h1></section>
-			     <section><h1>Overview</h1>
+			     <section><h1>I've heard the name...</h1>
 			     <ul>
-			        <li>Popular for Visualization (Maps!)</li>
-				<li>Join Semantics between DOM and Data</li>
-				<li>Low Level Package</li>
-				<li>Spawning High Level Add-Ons<ul>
-				  <li>NVD3 (Novus)</li>
-				  <li>Rickshaw (Shutterstock)</li>
-				  <li>DC.js (Nick Zhu)</li>
-				  <li>Vega</li></ul>
-				</li>
-		             </ul>
-			     </section>
+			     	<li>Popular for Inline SVG Rendering</li>
+			     	<li>Fantastic Mapping Support</li>
+				 	<li>Low Level Package (think jQuery)</li>
+		         </ul></section>
 			     <section><h1>Selections</h1>
 			     <ul>
-			       <li><strong>d3.select</strong> for single nodes</li>
-			       <li><strong>d3.selectAll</strong> for multiple nodes</li>
-			       <li>Joined to data using <strong>data</strong></li>
-			       <li>Chained style for most operations</li>
+			       <li><strong>d3.select</strong> selects a DOM single node.</li>
+			       <li><strong>d3.selectAll</strong> selects a group of DOM nodes</li>
 			     </ul>
-			     </section>
-			     <section><h1>Making a Selection</h1>
-			     <pre><code contenteditable id="selection1-code">
-//Select all of the &lt;li&gt; elements inside of &lt;ul id="selection1"&gt;
-var ds  = ["Item 1","Item 2","Item 3","Item 4"];
-var items = d3.select('ul#selection1').selectAll('li').data(ds);
+			     <pre><code contenteditable>
+//Chainable for subselections
+d3.select("div#mydiv").selectAll("p");
+
+//Or in jQuery-style
+d3.selectAll("div#mydiv p");
+
+//Or grouped
+d3.selectAll("div").selectAll("p");
+
+//Flat-styled grouping (but has limited utility)
+d3.selectAll("div p");
                              </code></pre>
-			     <ul>
-			       <li>Working with <strong>items</strong> for elements in the selection and the data.</li>
-			       <li><strong>items.enter()</strong> for elements in the data, but not the selection.</li>
-			       <li><stroong>item.exit()</strong> for elements in the selection, but not the data.</li> 
-			     </ul>
 			     </section>
+			     <section><h1>Binding Data</h1>
+			     <ul>
+			       <li>Uses the <strong>data()</strong> function.</li>
+			       <li>Acts something like a full outer join.</li>
+			     </ul>
+			     <pre><code contenteditable>
+var colors = ["#66C2A5","#FC8D62","#8DA0CB"];
+var x = d3.select("div#colors").selectAll("div").data(colors);
+                 </code></pre>
+			     </section>
+			     <section><h1>Manipulating the Join</h1>
+			     <pre><code>var x = d3.select("div#colors").selectAll("div").data(colors);</code></pre>
+			     <svg width="640" height="480" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with SVG-edit - http://svg-edit.googlecode.com/ -->
+ <g>
+  <title>Layer 1</title>
+  <ellipse ry="122" rx="122" id="svg_3" cy="237" cx="242" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="5" stroke="#7f7f7f" fill="#d4ffaa" opacity="0.5"/>
+  <ellipse opacity="0.5" id="svg_5" ry="122" rx="122" cy="237" cx="398" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="5" stroke="#7f7f7f" fill="#ffd4aa"/>
+  <text xml:space="preserve" text-anchor="middle" font-family="serif" font-size="24" id="svg_6" y="243.5" x="312" opacity="0.5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="0" stroke="#7f7f7f" fill="#fff">x</text>
+  <text xml:space="preserve" text-anchor="middle" font-family="serif" font-size="24" id="svg_7" y="243.5" x="197" opacity="0.5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="0" stroke="#7f7f7f" fill="#fff">x.enter()</text>
+  <text xml:space="preserve" text-anchor="middle" font-family="serif" font-size="24" id="svg_8" y="243.5" x="440" opacity="0.5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="0" stroke="#7f7f7f" fill="#fff">x.exit()</text>
+  <text xml:space="preserve" text-anchor="middle" font-family="serif" font-size="24" id="svg_9" y="93.5" x="236" opacity="0.5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="0" stroke="#7f7f7f" fill="#fff">data</text>
+  <text xml:space="preserve" text-anchor="middle" font-family="serif" font-size="24" id="svg_10" y="93.5" x="406" opacity="0.5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="0" stroke="#7f7f7f" fill="#fff">selectAll</text>
+ </g>
+</svg>
 			  </section>
+			     <section><h1>A Simple Visualization</h1>
+			     	<pre><code contenteditable>
+var svg = d3.select('#a-simple-visualization')
+	.append('svg').attr({width:"400",height:"400"});
+var points = generateRandomPoints(400,400,50);
+//Update
+var x = svg.selectAll("circle").data(points)
+	.attr({cx:function(d) { return d.x;},
+	cy:function(d) { return d.y},
+	r:function(d) { return d.r; }});
+//Create
+x.enter().append("circle")
+	.attr({cx:function(d) { return d.x;},
+	cy:function(d) { return d.y},
+	r:function(d) { return d.r; }});
+			     	</code></pre>
+			     </section>
+			     <section>
+			     	<div id="a-simple-visualization" style="width:400px;height:400px;border: white solid 1px;margin: 0 auto;"></div>
+			     	<input type="button" id="a-simple-visualization-go" value="Go"/>
+			  	 </section>
+			  
+			  </section>
+			  
 			  <section>
-			     <section><h1>Server Sent Events</h1><ul>
-			       <li>Like a Broadcast-only WebSockets</li>
-			       <li>Automatically reconnects (on browsers I use)</li>
-			       <li>Out-of-the-box support for Chrome (6+), Safari (5+), Firefox (6+), Opera (11+)</li>
-			       <li>Also supported on Mobile Safari (4+), Opera Mobile (11.1+) and Blackberry (7+)</li>
-			       <li>Not supported by IE (which does support WebSockets in 10.0), Android Browser</li>
-			       <li>HTTP-only protocol, at least two polyfill solutions available</li>
-			     </ul></section>
-			     <section><h1>Protocol Format</h1><pre><code>
+			  	<section><h1>Elements of a D3.js Visualization</h1></section>
+			  	<section><h1>Scales</h1><ul>
+			  		<li>Converts from a domain (e.g. -1,1) to a range (e.g. 0,10)</li>
+		  			<li>Linear and Power scales (e.g. log)</li>
+		  			<li>Color Ramps</li>
+			  		<li>Ordinal Scales</li>
+			  	</ul></section>
+			  	<section><h1>Shapes</h1><ul>
+			  		<li>Lines and Arcs</li>
+			  		<li>Areas and Chords</li>
+			  		<li>Symbols</li>
+			  	</ul></section>
+			  	<section><h1>Cartography</h1><ul>
+			  		<li>GeoJSON and TopoJSON Support</li>
+			  		<li>Comprehensive projection support</li>
+			  	</ul></section>
+			  	<section><h1>Axes</h1><ul>
+			  		<li>Used with Scales</li>
+			  		<li>Render axes onto plots</li>
+			  		<li>Fine control over ticks and labels</li>
+			  	</ul></section>
+			  	<section><h1>Layouts</h1><ul>
+			  		<li>Treemaps and Hierarchical Packings</li>
+			  		<li>Stacked Charts</li>
+			  		<li>Histograms</li>
+			  		<li>Hierarchical Partitioning</li>
+			  		<li>Force Directed Layouts</li>
+			  		<li>Chord Layouts</li>
+			  		<li>...and more via plugins</li>
+			  	</ul></section>
+			  	<section><h1>Lots of Examples</h1>
+			  		<h3><a href="http://bl.ocks.org/mbostock">bl.ocks.org/mbostock</a></h3>
+			  	</section>
+			  </section>
+			  
+			  <!-- Higher Level Interfaces -->
+			  <section>
+			  	<section><h1>Still Sounds Like Work</h1></section>
+			  	<section><h1>Lots of Higher Level Packages</h1>
+			  	<ul>
+				   <li>NVD3 (Novus)</li>
+				   <li>Rickshaw (Shutterstock)</li>
+				   <li>DC.js (Nick Zhu)</li>
+				   <li>Vega (Trifacta)</li>
+				   <li>PolychartJS (Commercial)</li>
+				</ul></section>
+				<section><h1>DC.js Example</h1>
+				</section>
+				<section><h1>Vega Example</h1>
+					
+				</section>
+			  </section>
+			
+			  <!-- Getting Data There -->
+			  <section>
+			  	<section><h1>Getting The Data</h1></section>
+			  	<section><h1>Modern Transports</h1><ul>
+			  		<li>AJAX Polling Techniques</li>
+			  		<li>Server Sent Events (Unidirectional)</li>
+			  		<li>WebSockets (Bidirectional)</li>			  		
+			  	</ul></section>
+			  	
+			  	<section><h1>Server Sent Events</h1><ul>
+			  		<li>Pretty good native browser support.</li>			  		
+			  		<li>Pure HTTP Protocol, available "polyfill" libraries.</li>
+			  		<li>Broadcast only.</li>
+			  	</ul></section>
+			  		
+			     <section><h1>The Format</h1><pre><code>
 Content-Type: text/event-stream
 
 data: message 1 line 1
@@ -104,51 +264,43 @@ data: ids are optional
 retry: 10000
 data: you can also specify a reconnect time (default is 3 seconds).
 			     </code></pre></section>
-			     <section><h1>Wiring Up SSE</h1>
+			     <section><h1>The EventSource Object</h1>
 			     <pre><code contenteditable>
-var source = new EventSource("/events");
+var source   = new EventSource("/events");
 source.addEventListener('message',function(event) {
    var json = null;
    try {
      json = JSON.parse(event.data); 
    } catch(e) { }
    if(json != null) {
-      for(var section in json) {
-          
-      }
+   	//json now contains the data passed from the server
    }
 });
 			     </code></pre></section>
-			     
-			   </section>
-			        <section>
-			  <div class="gridster" style="left: -50%;">
-			    <ul>
-			      <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">VIEWS</li>
-			      <li data-row="2" data-col="1" data-sizex="1" data-sizey="1"></li>
-			      <li data-row="3" data-col="1" data-sizex="1" data-sizey="1"></li>
- 
-			      <li data-row="1" data-col="2" data-sizex="2" data-sizey="1"></li>
-			      <li data-row="2" data-col="2" data-sizex="2" data-sizey="2"></li>
-			      
-			      <li data-row="1" data-col="4" data-sizex="1" data-sizey="1">CLICKS</li>
-			      <li data-row="2" data-col="4" data-sizex="2" data-sizey="1"></li>
-			      <li data-row="3" data-col="4" data-sizex="1" data-sizey="1"></li>
-			      
-			      <li data-row="1" data-col="5" data-sizex="1" data-sizey="1"></li>
-			      <li data-row="3" data-col="5" data-sizex="1" data-sizey="1"><span style="font-size: 80%">REVENUE</span></li>
-			      
-			      <li data-row="1" data-col="6" data-sizex="1" data-sizey="1"></li>
-			      <li data-row="2" data-col="6" data-sizex="1" data-sizey="2"></li>
-			    </ul>
-			  </div>
-			        </section>
-
+			  <section><h1>Basic Server</h1>
+			  	<pre><code contenteditable>
+function eventStream(req,res,cb) {
+	req.socket.setTimeout(Infinity);
+	req.writeHead(200,{
+		'Content-Type':'text/event-stream',
+		'Cache-Control':'no-cache',
+		'Connection':'keepalive'	
+	});
+	cb(res,function(obj) { res.write("data:"+JSON.stringify(obj)+"\n\n"); });
+}			  		
+			  	</code></pre>
+			  </section>
+			  </section>
 			  
-				<section>
-					<h1>Questions?</h1>
-				</section>
-
+			  <!-- Processing Data -->
+			  <section>
+			  	<section><h1>Processing Data With Storm</h1></section>
+			  	<section><h1>What's That?</h1><ul>
+			  		<li>Streaming Processing Framework</li>
+			  		<li>"Hadoop for Streaming Data"</li>
+			  	</ul></section>
+			  </section>
+			  
 			</div>
 
 		</div>
@@ -165,7 +317,7 @@ source.addEventListener('message',function(event) {
 			Reveal.initialize({
 				controls: false,
 				progress: false,
-				history: false,
+				history: true,
 				center: true,
 
 				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
@@ -189,6 +341,7 @@ source.addEventListener('message',function(event) {
 		        });
 		});
 		</script>
+		<script src="js/examples.js"></script>
 
 	</body>
 </html>
