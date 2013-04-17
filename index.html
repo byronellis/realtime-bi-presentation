@@ -74,10 +74,53 @@
 var ds  = ["Item 1","Item 2","Item 3","Item 4"];
 var items = d3.select('ul#selection1').selectAll('li').data(ds);
                              </code></pre>
+			     <ul>
+			       <li>Working with <strong>items</strong> for elements in the selection and the data.</li>
+			       <li><strong>items.enter()</strong> for elements in the data, but not the selection.</li>
+			       <li><stroong>item.exit()</strong> for elements in the selection, but not the data.</li> 
+			     </ul>
 			     </section>
-
-			     
 			  </section>
+			  <section>
+			     <section><h1>Server Sent Events</h1><ul>
+			       <li>Like a Broadcast-only WebSockets</li>
+			       <li>Automatically reconnects (on browsers I use)</li>
+			       <li>Out-of-the-box support for Chrome (6+), Safari (5+), Firefox (6+), Opera (11+)</li>
+			       <li>Also supported on Mobile Safari (4+), Opera Mobile (11.1+) and Blackberry (7+)</li>
+			       <li>Not supported by IE (which does support WebSockets in 10.0), Android Browser</li>
+			       <li>HTTP-only protocol, at least two polyfill solutions available</li>
+			     </ul></section>
+			     <section><h1>Protocol Format</h1><pre><code>
+Content-Type: text/event-stream
+
+data: message 1 line 1
+data: message 1 line 2
+
+data: message 2 line 1
+
+id: 1
+data: ids are optional
+
+retry: 10000
+data: you can also specify a reconnect time (default is 3 seconds).
+			     </code></pre></section>
+			     <section><h1>Wiring Up SSE</h1>
+			     <pre><code contenteditable>
+var source = new EventSource("/events");
+source.addEventListener('message',function(event) {
+   var json = null;
+   try {
+     json = JSON.parse(event.data); 
+   } catch(e) { }
+   if(json != null) {
+      for(var section in json) {
+          
+      }
+   }
+});
+			     </code></pre></section>
+			     
+			   </section>
 			        <section>
 			  <div class="gridster" style="left: -50%;">
 			    <ul>
