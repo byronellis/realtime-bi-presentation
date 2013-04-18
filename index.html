@@ -4,10 +4,8 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>reveal.js - The HTML Presentation Framework</title>
+		<title>Realtime BI Presentation</title>
 
-		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
-		<meta name="author" content="Hakim El Hattab">
 
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -164,7 +162,8 @@ var x      = d3.scale.linear()
 			  		
 //Or some nice colors...
 var color = d3.scale.ordinal()
-    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);			  		
+    .range(["#98abc5", "#8a89a6", "#7b6888", 
+    	"#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);			  		
 			  	</code></pre></section>
 			  	<section><h1>Shapes</h1><ul>
 			  		<li>Lines and Arcs</li>
@@ -313,7 +312,7 @@ function eventStream(req,res,cb) {
 			  <!-- Processing Data -->
 			  <section>
 			  	<section><h1>Where Does Data Come From?</h1></section>
-			  	<section><h1>From Storm!</h1><ul>
+			  	<section><h1>Storm!</h1><ul>
 			  		<li>"Hadoop for Streaming Data"</li>
 			  		<li>Java-based</li>
 			  		<li>Manages distributed stream computations.</li>
@@ -381,6 +380,11 @@ public void execute(Tuple input) {
 	},1000,1000);					
 					</code></pre>
 				</section>
+				
+				<section><h1>Topology Definitions</h1>
+					<pre><code contenteditable></code></pre>
+				</section>
+				
 			</section>
 
 			<section>
@@ -393,11 +397,11 @@ public void execute(Tuple input) {
 					<li>Coordinates via ZooKeeper</li>
 					<li>"Plays well with others"</li>
 				</ul></section>
-				<section><h1>Basic Components</h1>
-					<li><strong>Brokers</strong> store a fraction of the data for a specific period of time.</li>
+				<section><h1>Basic Components</h1><ul>
+					<li><strong>Brokers</strong> store data for fixed time periods.</li>
 					<li><strong>Consumers</strong> communicate with brokers to read data.</li>
 					<li><strong>Producers</strong> send data to brokers to be stored.</li>
-				</section>
+				</ul></section>
 			</section>			
 			
 			<section>
@@ -451,6 +455,7 @@ public void execute(Tuple input) {
                 <script src="js/jquery.js"></script>
 		<script src="js/gridster.js"></script>
 		<script src="js/d3.v3.min.js"></script>
+		<script src="js/dc.min.js"></script>
 		<script>
 		$(function() {
 			// Full list of configuration options available here:

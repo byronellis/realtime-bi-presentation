@@ -60,4 +60,11 @@ $(function() {
 	
 	draw();
 	
-})
+});
+
+
+$(function() {
+	var data = [];
+	for(var i=0;i<100;i++) { data.push({x:Math.random(),y:Math.random()}); }
+	
+});
