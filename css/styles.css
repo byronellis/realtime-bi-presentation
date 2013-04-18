@@ -34,3 +34,14 @@
 	color: #FFF;
 	font-size: 110%;
 }
+
+li strong {
+	color: orange;
+}
+
+svg circle {
+	fill: orange;
+	stroke: black;
+	stroke-width: 3;
+	opacity: 0.5;
+}

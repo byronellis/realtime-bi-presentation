@@ -65,40 +65,7 @@
 					</section>
 		      </section>
 
-			 <!-- Demo Visualization -->
-			<section>
-			  <div class="gridster" style="left: -50%;">
-			    <ul>
-			      <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
-			      	<p>LINES</p>
-			      	<p class="statistic" data-segment="statistics" data-value="lines" data-format="number">0</p>
-			      </li>
-			      <li data-row="2" data-col="1" data-sizex="1" data-sizey="1"></li>
-			      <li data-row="3" data-col="1" data-sizex="1" data-sizey="1"></li>
- 
-			      <li data-row="1" data-col="2" data-sizex="2" data-sizey="1"></li>
-			      <li data-row="2" data-col="2" data-sizex="2" data-sizey="2">
-			      	<p>POPULARITY</p>
-			      </li>
-			      
-			      <li data-row="1" data-col="4" data-sizex="1" data-sizey="1">
-			      	<p>WORDS</p>
-			      	<p class="statistic" data-segment="statistics" data-value="words" data-format="number">0</p>			      	
-			      </li>
-			      <li data-row="2" data-col="4" data-sizex="2" data-sizey="1"></li>
-			      <li data-row="3" data-col="4" data-sizex="1" data-sizey="1"></li>
-			      
-			      <li data-row="1" data-col="5" data-sizex="1" data-sizey="1"></li>
-			      <li data-row="3" data-col="5" data-sizex="1" data-sizey="1">
-			      	<p style="font-size: 80%">SPEAKERS</p>
-			      	<p class="statistic" data-segment="statistics" data-value="actors" data-format="number">0</p>			      	
-			      </li>
-			      
-			      <li data-row="1" data-col="6" data-sizex="1" data-sizey="1"></li>
-			      <li data-row="2" data-col="6" data-sizex="1" data-sizey="2"></li>
-			    </ul>
-			  </div>
-			  </section>			 		      
+				      
 		      
 		      
 		      
@@ -189,11 +156,74 @@ x.enter().append("circle")
 		  			<li>Color Ramps</li>
 			  		<li>Ordinal Scales</li>
 			  	</ul></section>
+			  	<section><pre><code>
+//Your basic linear axis
+var x      = d3.scale.linear()
+	.domain([0,d3.sum(words,function(d) { return d.count; })])
+	.range([0,1]);
+			  		
+//Or some nice colors...
+var color = d3.scale.ordinal()
+    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);			  		
+			  	</code></pre></section>
 			  	<section><h1>Shapes</h1><ul>
 			  		<li>Lines and Arcs</li>
 			  		<li>Areas and Chords</li>
 			  		<li>Symbols</li>
 			  	</ul></section>
+				<section><pre><code>
+//Create an arc shape using SVG
+var arc = d3.svg.arc()
+	.outerRadius(190)
+	.innerRadius(130);						
+				</code></pre></section>
+			  	<section><h1>Layouts</h1><ul>
+			  		<li>Treemaps and Hierarchical Packings</li>
+			  		<li>Stacked Charts</li>
+			  		<li>Histograms</li>
+			  		<li>Hierarchical Partitioning</li>
+			  		<li>Force Directed Layouts</li>
+			  		<li>Chord Layouts</li>
+			  		<li>...and more</li>
+			  	</ul></section>
+			  	<section><pre><code>
+//Like pie charts...
+var pie = d3.layout.pie()
+	.sort(null)
+	.value(function(d) { return x(d.count); });
+			  	</code></pre></section>
+			  	<section><h1>Mix It Together</h1>
+				<pre><code>
+var arcs = svg.selectAll("g.arc")
+	.data(pie(words),function(d) { return d.data.word; });
+		
+var newArcs = arcs.enter().append("g").attr("class","arc");
+		
+newArcs.append("path")
+	.style("fill",function(d) { return color(d.data.word); })
+	.attr("d",arc);
+newArcs.append("text")
+	.attr("transform",
+	function(d) { return "translate("+arc.centroid(d)+")"; })
+	.attr({dy:".35em"}).style({"text-anchor":"middle",
+		"font-size":"40%","fill":"#fff"})
+	.text(function(d) { return d.data.word; });
+				</code></pre>
+			  	</section>
+			  	<section><h1>Update Arcs Too...</h1>
+			  		<pre><code>
+//Update existing elements
+arcs.select("path").attr("d",arc);
+arcs.select("text")
+	.attr("transform",
+	function(d) { return "translate("+arc.centroid(d)+")"; });
+			  		</code></pre>
+			  	</section>
+			  	<section><h1>Ta Da!</h1>
+			  		<div id="example-2" style="width:400px;height:400px;border: white solid 1px;margin: 0 auto;"></div>
+			  		<input type="button" id="example-2-go" value="Go"/>
+			  	</section>
+			  	<section><h1>And Lots More...</h1></section>
 			  	<section><h1>Cartography</h1><ul>
 			  		<li>GeoJSON and TopoJSON Support</li>
 			  		<li>Comprehensive projection support</li>
@@ -203,16 +233,7 @@ x.enter().append("circle")
 			  		<li>Render axes onto plots</li>
 			  		<li>Fine control over ticks and labels</li>
 			  	</ul></section>
-			  	<section><h1>Layouts</h1><ul>
-			  		<li>Treemaps and Hierarchical Packings</li>
-			  		<li>Stacked Charts</li>
-			  		<li>Histograms</li>
-			  		<li>Hierarchical Partitioning</li>
-			  		<li>Force Directed Layouts</li>
-			  		<li>Chord Layouts</li>
-			  		<li>...and more via plugins</li>
-			  	</ul></section>
-			  	<section><h1>Lots of Examples</h1>
+			  	<section><h1>Some More Examples</h1>
 			  		<h3><a href="http://bl.ocks.org/mbostock">bl.ocks.org/mbostock</a></h3>
 			  	</section>
 			  </section>
@@ -228,11 +249,6 @@ x.enter().append("circle")
 				   <li>Vega (Trifacta)</li>
 				   <li>PolychartJS (Commercial)</li>
 				</ul></section>
-				<section><h1>DC.js Example</h1>
-				</section>
-				<section><h1>Vega Example</h1>
-					
-				</section>
 			  </section>
 			
 			  <!-- Getting Data There -->
@@ -248,6 +264,7 @@ x.enter().append("circle")
 			  		<li>Pretty good native browser support.</li>			  		
 			  		<li>Pure HTTP Protocol, available "polyfill" libraries.</li>
 			  		<li>Broadcast only.</li>
+			  		<li>Browser automatically reconnects</li>
 			  	</ul></section>
 			  		
 			     <section><h1>The Format</h1><pre><code>
@@ -273,7 +290,8 @@ source.addEventListener('message',function(event) {
      json = JSON.parse(event.data); 
    } catch(e) { }
    if(json != null) {
-   	//json now contains the data passed from the server
+   	 //Really simple data binding to jQuery events
+	 for(var i in json) $(document).trigger('data:'+i,json[i]);
    }
 });
 			     </code></pre></section>
@@ -294,13 +312,136 @@ function eventStream(req,res,cb) {
 			  
 			  <!-- Processing Data -->
 			  <section>
-			  	<section><h1>Processing Data With Storm</h1></section>
-			  	<section><h1>What's That?</h1><ul>
-			  		<li>Streaming Processing Framework</li>
+			  	<section><h1>Where Does Data Come From?</h1></section>
+			  	<section><h1>From Storm!</h1><ul>
 			  		<li>"Hadoop for Streaming Data"</li>
+			  		<li>Java-based</li>
+			  		<li>Manages distributed stream computations.</li>
 			  	</ul></section>
-			  </section>
-			  
+			  	
+			    <section><h1>Basic Concepts</h1>
+			    <ul>
+			   	 <li><strong>Bolts</strong> are units of processing. Take input stream(s), produce output stream(s).</li>
+			  	 <li><strong>Spouts</strong> are units of input. Bring data in from an external source.</li>
+			  	 <li><strong>Tuples</strong> are arrays of objects that Spouts and Bolts use to communicate.</li>
+			  	 <li><strong>Topologies</strong> are arrangements of Spouts and Storms.</li>
+			    </ul></section>
+			    <section><h1>Storm Components</h1>
+			    	<ul>
+			    		<li><strong>Supervisors</strong> manage computation on a node. Like TaskTracker.</li>
+			    		<li><strong>Nimbus</strong> manages a collection of supervisors and their topologies</li>
+			    	</ul>
+			    </section>
+				<section><h1>Controlling Topologies</h1>
+					<ul>
+						<li>storm jar topology.jar my.topology.TopologyMain</li>
+						<li>storm kill topologies-have-a-name</li>
+					</ul>
+				</section>
+
+				<section><h1>Simple Word Count</h1>
+					<pre><code contenteditable>
+public void execute(Tuple input) {
+	try {
+		long   line    = input.getLongByField("line");
+		String speaker = input.getStringByField("speaker");
+		String text    = input.getStringByField("text");
+		for(String word : line.toLowerCase().split("\\s+")) {
+			redis.zadd("Word:"+word,line,""+line);
+			redis.sadd("Words",word);
+			redis.sadd("Speakers",speaker);
+			synchronized(updated) { updated.add(word); }
+		}
+	} catch(Exception e) { 
+		collector.reportError(e.getMessage());
+	} finally {
+		collector.ack(input);
+	}
+}						
+					</code></pre>
+				</section>
+
+				<section><h1>Background Update</h1>
+					<pre><code contenteditable>
+(new Timer("Updater"))
+	.schedule(new TimerTask() {
+		public void run() {
+			HashSet todo;
+			synchronized(update) { 
+				todo=updated();updated = new HashSet(); 
+			}
+			for(String word : todo) {
+				redis.zadd("WordCount",
+					conn.zcard("Word:"+word), word);
+			}
+			if(todo.size() > 0)
+				redis.publish("WordCount",
+					""+todo.size());
+		}
+	},1000,1000);					
+					</code></pre>
+				</section>
+			</section>
+
+			<section>
+				<section><h1>Moving Data Around</h1></section>
+				<section><h1>Kafka</h1><ul>
+					<li>Developed by LinkedIn</li>					
+					<li>Similar to <strong>Flume</strong>, <strong>Scribe</strong>, <strong>Kestrel</strong>, etc</li>
+					<li>Distributed persistent log motion (not a queue system)</li>
+					<li>Data agnostic</li>
+					<li>Coordinates via ZooKeeper</li>
+					<li>"Plays well with others"</li>
+				</ul></section>
+				<section><h1>Basic Components</h1>
+					<li><strong>Brokers</strong> store a fraction of the data for a specific period of time.</li>
+					<li><strong>Consumers</strong> communicate with brokers to read data.</li>
+					<li><strong>Producers</strong> send data to brokers to be stored.</li>
+				</section>
+			</section>			
+			
+			<section>
+				<section><h1>Putting it all together</h1></section>
+				 <!-- Demo Visualization -->
+			<section>
+			  <div class="gridster" style="left: -50%;">
+			    <ul>
+			      <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+			      	<p>LINES</p>
+			      	<p class="statistic" data-segment="statistics" data-value="lines" data-format="number">0</p>
+			      </li>
+			      <li data-row="2" data-col="1" data-sizex="1" data-sizey="1"></li>
+			      <li data-row="3" data-col="1" data-sizex="1" data-sizey="1"></li>
+ 
+			      <li data-row="1" data-col="2" data-sizex="2" data-sizey="1"></li>
+			      <li data-row="2" data-col="2" data-sizex="2" data-sizey="2">
+			      	<p>POPULARITY</p>
+			      </li>
+			      
+			      <li data-row="1" data-col="4" data-sizex="1" data-sizey="1">
+			      	<p>WORDS</p>
+			      	<p class="statistic" data-segment="statistics" data-value="words" data-format="number">0</p>			      	
+			      </li>
+			      <li data-row="2" data-col="4" data-sizex="2" data-sizey="1"></li>
+			      <li data-row="3" data-col="4" data-sizex="1" data-sizey="1"></li>
+			      
+			      <li data-row="1" data-col="5" data-sizex="1" data-sizey="1"></li>
+			      <li data-row="3" data-col="5" data-sizex="1" data-sizey="1">
+			      	<p style="font-size: 80%">SPEAKERS</p>
+			      	<p class="statistic" data-segment="statistics" data-value="actors" data-format="number">0</p>			      	
+			      </li>
+			      
+			      <li data-row="1" data-col="6" data-sizex="1" data-sizey="1"></li>
+			      <li data-row="2" data-col="6" data-sizex="1" data-sizey="2"></li>
+			    </ul>
+			  </div>
+			  </section>			 	
+			</section>
+			
+			<section><h1>Thanks!</h1>
+				<a href="http://github.com/byronellis/realtime-bi-presentation">github.com/byronellis/realtime-bi-presentation</a>
+			</section>
+							  
 			</div>
 
 		</div>
