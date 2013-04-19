@@ -30,22 +30,29 @@ $(function() {
 	var arc = d3.svg.arc()
 		.outerRadius(190)
 		.innerRadius(130);
-			      		
+	function arcTween(a) {
+  		var i = d3.interpolate(this._current, a);
+  		this._current = i(0);
+  		return function(t) {
+    		return arc(i(t));
+  		};
+	}			      		
 	function draw() {
-		console.log(JSON.stringify(pie(words)));
 		var arcs = svg.selectAll("g.arc").data(pie(words),function(d) { return d.data.word; });
-		arcs.exit().remove();
+		//arcs.exit().remove();
 		
-		//Update existing elements
-		arcs.select("path").attr("d",arc);
-		arcs.select("text").attr("transform",function(d) { return "translate("+arc.centroid(d)+")"; });
+		//Update existing elements with animation!
+		
+		arcs.select("path").transition().duration(750).attrTween("d",arcTween);
+		arcs.select("text").transition().duration(750).attr("transform",function(d) { return "translate("+arc.centroid(d)+")"; });
 		
 		//Create new elements
 		var newArcs = arcs.enter().append("g").attr("class","arc");
 		
 		newArcs.append("path")
 			.style("fill",function(d) { return color(d.data.word); })
-			.attr("d",arc);
+			.attr("d",arc)
+			.each(function(d) { this._current = d});
 		newArcs.append("text")
 			.attr("transform",function(d) { return "translate("+arc.centroid(d)+")"; })
 			.attr({dy:".35em"}).style({"text-anchor":"middle","font-size":"40%","fill":"#fff"})

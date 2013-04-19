@@ -218,6 +218,23 @@ arcs.select("text")
 	function(d) { return "translate("+arc.centroid(d)+")"; });
 			  		</code></pre>
 			  	</section>
+			  	<section><h1>Or Add Some Animation</h1><pre><code>
+arcs.select("path").transition().duration(750)
+	.attrTween("d",arcTween);
+arcs.select("text").transition().duration(750)
+	.attr("transform",function(d) { 
+		return "translate("+arc.centroid(d)+")"; 
+	});
+			  	</code></pre></section>
+			  	<section><h1>Custom "tween" function</h1><pre><code>
+	function arcTween(a) {
+  		var i = d3.interpolate(this._current, a);
+  		this._current = i(0);
+  		return function(t) {
+    		return arc(i(t));
+  		};
+	}			      					  		
+			  	</code></pre></section>
 			  	<section><h1>Ta Da!</h1>
 			  		<div id="example-2" style="width:400px;height:400px;border: white solid 1px;margin: 0 auto;"></div>
 			  		<input type="button" id="example-2-go" value="Go"/>
@@ -382,7 +399,17 @@ public void execute(Tuple input) {
 				</section>
 				
 				<section><h1>Topology Definitions</h1>
-					<pre><code contenteditable></code></pre>
+					<pre><code contenteditable>
+TopologyBuilder builder = new TopologyBuilder();
+builder.setSpout("spout", (new SimpleKafkaSpout()).topic("hamlet"));
+builder.setBolt("event", new EventParserBolt())
+	.shuffleGrouping("spout");
+builder.setBolt("words", (new WordCountBolt()).redis("localhost"))
+	.shuffleGrouping("event");
+Map conf = new HashMap();
+conf.put(Config.TOPOLOGY_WORKERS, 1);
+conf.put(Config.TOPOLOGY_DEBUG, "true");
+					</code></pre>
 				</section>
 				
 			</section>
@@ -398,21 +425,110 @@ public void execute(Tuple input) {
 					<li>"Plays well with others"</li>
 				</ul></section>
 				<section><h1>Basic Components</h1><ul>
-					<li><strong>Brokers</strong> store data for fixed time periods.</li>
-					<li><strong>Consumers</strong> communicate with brokers to read data.</li>
-					<li><strong>Producers</strong> send data to brokers to be stored.</li>
+					<li><strong>Topics</strong> are "channels" of related data.</li>
+					<li><strong>Brokers</strong> store data from topics fixed time periods.</li>
+					<li><strong>Consumers</strong> communicate with brokers to read data from topics.</li>
+					<li><strong>Producers</strong> send data to brokers to be stored in a topic.</li>
+				</ul></section>
+				<section><h1>Usage</h1><ul>
+					<li>Topics are created and destroyed on the fly</li>
+					<li>Supports Consumer Groups for distributed processing.</li>
+					<li>Native compression available through gzip or snappy.</li>
+					<li>Cluster-to-cluster replication out of the box.</li>
+					<li>Can monitor clients by watching ZooKeeper directly.</li>
+				</ul>					
+				</section>
+				<section><h1>That's pretty much it...</h1><ul>
+					<li>Monitor the disk carefully, it will happily fill it.</li>
+					<li>Version 0.8 adds internal replication and lots of other goodies.</li>
 				</ul></section>
 			</section>			
 			
+			
 			<section>
 				<section><h1>Putting it all together</h1></section>
+				<section><h1>node.js Event Producer</h1></section>
+				<section><pre><code>
+var fs    = require('fs')
+,	kafka = require('kafka');
+fs.readFile("hamlet.txt",{encoding:"UTF-8"},function(err,data) {
+	var lines = (""+data).split("\n");
+	var producer = new kafka.Producer({topic:'hamlet'})
+		.connect(function() {
+		var i = 0;
+		setInterval(function() {
+			var line = lines[Math.floor(
+				lines.length*Math.random())];
+			var p    = line.split("\t");
+			producer.send(""+i+"\t"+p[1]+"\t"+p[2]);
+			i++;
+		},500);
+	});
+});					
+				</code></pre></section>
+				<section><h1>Simple Storm Kafka Spout</h1></section>
+				<section><h1>Initialization</h1>
+					<pre><code>
+transient SpoutOutputCollector collector;
+transient SimpleConsumer       consumer;
+transient long                 offset;
+	
+public void open(Map conf, TopologyContext context,
+			SpoutOutputCollector collector) {
+	this.collector = collector;
+	consumer = new SimpleConsumer(host,port,timeout,buffer);
+	offset = 0;
+}
+public void declareOutputFields(OutputFieldsDeclarer declarer) {
+	declarer.declare(new Fields("message"));
+}
+						
+					</code></pre>
+				</section>
+				<section><h1>Reading from Kafka</h1>
+					<pre><code>
+public void nextTuple() {
+	FetchRequest req = new FetchRequest(topic,0,offset,1024*1024);
+	ByteBufferMessageSet messages = consumer.fetch(req);
+	Iterator<MessageAndOffset> iter = messages.iterator();
+	while(iter.hasNext()) {
+		MessageAndOffset msg = iter.next();
+		collector.emit(new Values(
+			Utils.toString(msg.message().payload(), 
+			"UTF-8")));
+		offset = msg.offset();
+	}
+	//... Sleep handling
+}
+					</code></pre>
+				</section>
+				<section><h1>Parse Messages</h1>
+					<pre><code>
+transient OutputCollector collector;
+public void prepare(Map stormConf, TopologyContext context,
+		OutputCollector collector) {
+	this.collector = collector;
+}
+public void declareOutputFields(OutputFieldsDeclarer declarer) {
+	declarer.declare(new Fields("line","speaker","text"));
+}
+public void execute(Tuple input) {
+		String[] parts = input.getStringByField("message")
+			.split("\t");
+		Integer line = Integer.parseInt(parts[0]);
+		String  speaker = parts[1];
+		String  text    = parts[2];
+		collector.emit(new Values(line,speaker,text));
+}
+					</code></pre>
+				</section>
 				 <!-- Demo Visualization -->
 			<section>
 			  <div class="gridster" style="left: -50%;">
 			    <ul>
 			      <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
 			      	<p>LINES</p>
-			      	<p class="statistic" data-segment="statistics" data-value="lines" data-format="number">0</p>
+			      	<p class="statistic" id="processed">0</p>
 			      </li>
 			      <li data-row="2" data-col="1" data-sizex="1" data-sizey="1"></li>
 			      <li data-row="3" data-col="1" data-sizex="1" data-sizey="1"></li>
@@ -420,11 +536,12 @@ public void execute(Tuple input) {
 			      <li data-row="1" data-col="2" data-sizex="2" data-sizey="1"></li>
 			      <li data-row="2" data-col="2" data-sizex="2" data-sizey="2">
 			      	<p>POPULARITY</p>
+			      	<div id="donut" style="width:250px;height:250px;margin: 0 auto;"></div>
 			      </li>
 			      
 			      <li data-row="1" data-col="4" data-sizex="1" data-sizey="1">
 			      	<p>WORDS</p>
-			      	<p class="statistic" data-segment="statistics" data-value="words" data-format="number">0</p>			      	
+			      	<p class="statistic" id="words">0</p>			      	
 			      </li>
 			      <li data-row="2" data-col="4" data-sizex="2" data-sizey="1"></li>
 			      <li data-row="3" data-col="4" data-sizex="1" data-sizey="1"></li>
@@ -432,7 +549,7 @@ public void execute(Tuple input) {
 			      <li data-row="1" data-col="5" data-sizex="1" data-sizey="1"></li>
 			      <li data-row="3" data-col="5" data-sizex="1" data-sizey="1">
 			      	<p style="font-size: 80%">SPEAKERS</p>
-			      	<p class="statistic" data-segment="statistics" data-value="actors" data-format="number">0</p>			      	
+			      	<p class="statistic" id="speakers">0</p>			      	
 			      </li>
 			      
 			      <li data-row="1" data-col="6" data-sizex="1" data-sizey="1"></li>
@@ -456,6 +573,7 @@ public void execute(Tuple input) {
 		<script src="js/gridster.js"></script>
 		<script src="js/d3.v3.min.js"></script>
 		<script src="js/dc.min.js"></script>
+		<script src="js/simple.js"></script>
 		<script>
 		$(function() {
 			// Full list of configuration options available here:
